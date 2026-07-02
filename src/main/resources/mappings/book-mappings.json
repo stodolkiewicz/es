@@ -1,0 +1,52 @@
+{
+  "mappings": {
+    "properties": {
+      "isbn13": {
+        "type": "keyword"
+      },
+      "isbn10": {
+        "type": "keyword"
+      },
+      "title": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "subtitle": {
+        "type": "text"
+      },
+      "authors": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "categories": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "thumbnail": {
+        "type": "keyword",
+        "index": false
+      },
+      "description": {
+        "type": "text"
+      },
+      "published_year": {
+        "type": "short"
+      },
+      "average_rating": {
+        "type": "float"
+      }
+    }
+  }
+}
