@@ -71,12 +71,8 @@ public class BookImportService {
     }
 
     private Book toBook(CSVRecord row) {
-        String isbn13 = emptyToNull(row.get("isbn13"));
         return Book.builder()
-                // isbn13 as _id keeps the import idempotent: re-running
-                // overwrites documents instead of duplicating them
-                .id(isbn13)
-                .isbn13(isbn13)
+                .isbn13(emptyToNull(row.get("isbn13")))
                 .isbn10(emptyToNull(row.get("isbn10")))
                 .title(emptyToNull(row.get("title")))
                 .subtitle(emptyToNull(row.get("subtitle")))

@@ -18,8 +18,6 @@ import java.util.List;
 @Mapping(mappingPath = "mappings/book-mappings.json")
 public class Book {
     @Id
-    private String id;
-
     private String isbn13;
     private String isbn10;
 
