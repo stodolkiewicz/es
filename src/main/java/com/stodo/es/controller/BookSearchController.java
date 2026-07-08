@@ -14,12 +14,17 @@ public class BookSearchController {
         this.bookSearchService = bookSearchService;
     }
 
-    record SearchBooksRequestBody(String description){};
+    record SearchByDescriptionRequest(String description) {}
 
-    @PostMapping("/search")
-    public BookSearchResult searchBooks(@RequestBody SearchBooksRequestBody searchBooksRequestBody) {
-        BookSearchResult bookSearchResult = bookSearchService.searchByDescription(searchBooksRequestBody.description());
+    record MultiMatchSearchRequest(String query) {}
 
-        return bookSearchResult;
+    @PostMapping("/search/match")
+    public BookSearchResult searchBooks(@RequestBody SearchByDescriptionRequest request) {
+        return bookSearchService.searchByDescription(request.description());
+    }
+
+    @PostMapping("/search/multi-match")
+    public BookSearchResult searchBooksMultiMatch(@RequestBody MultiMatchSearchRequest request) {
+        return bookSearchService.searchByDescriptionMultiMatch(request.query());
     }
 }
