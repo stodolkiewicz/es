@@ -80,12 +80,74 @@ public class BookSearchService {
         return mapSearchHitsToBookSearchResult(bookSearchHits);
     }
 
+    /*
+    Books published after 2000 get a score boost; older ones stay in results. A range in should adds a constant +1 to matching documents.
+
+    GET books/_search
+    {
+      "query": {
+        "bool": {
+          "must": [
+            { "match": { "description": "murder mystery" } }
+          ],
+          "filter": [
+            { "range": { "averageRating": { "gte": 4.0 } } }
+          ],
+          "must_not": [
+            { "term": { "categories.keyword": "Juvenile Fiction" } }
+          ],
+          "should": [
+            { "range": { "publishedYear": { "gt": 2000 } } }
+          ]
+        }
+      }
+    }
+    */
+    public BookSearchResult sampleBoolQuery(String description, Double averageRatingAbove, String category, int preferYearAfter) {
+
+        BoolQuery bq = new BoolQuery.Builder()
+                .must(m -> m.match(
+                        mq -> mq
+                                .field("description")
+                                .query(description)
+                ))
+                .filter(f -> f.range(
+                        rq -> rq.number(
+                                nrq -> nrq
+                                        .field("averageRating")
+                                        .gte(averageRatingAbove)
+                                )
+                ))
+                .mustNot(mn -> mn.term(
+                        tq -> tq
+                                .field("categories.keyword")
+                                .value(category)
+                                .caseInsensitive(true)
+                        )
+                )
+                .should(sq -> sq.range(
+                        rq -> rq.number(
+                                nq -> nq
+                                        .field("publishedYear")
+                                        .gt((double) preferYearAfter)
+                        )
+                ))
+                .build();
+
+        NativeQuery query = NativeQuery.builder()
+                .withQuery(Query.of(boolQuery -> boolQuery.bool(bq)))
+                .build();
+
+        return mapSearchHitsToBookSearchResult(esOps.search(query, Book.class));
+    }
+
     private BookSearchResult mapSearchHitsToBookSearchResult(SearchHits<Book> bookSearchHits) {
         List<BookHit> bookHits = bookSearchHits.stream().map(
                 book -> new BookHit(
                         book.getContent().getIsbn13(),
                         book.getContent().getTitle(),
                         book.getContent().getAuthors(),
+                        book.getContent().getCategories(),
                         book.getScore())
         ).toList();
 

@@ -18,6 +18,8 @@ public class BookSearchController {
 
     record MultiMatchSearchRequest(String query) {}
 
+    record BoolSearchRequest(String description, Double averageRatingAbove, String category, int preferYearAfter) {}
+
     @PostMapping("/search/match")
     public BookSearchResult searchBooks(@RequestBody SearchByDescriptionRequest request) {
         return bookSearchService.searchByDescription(request.description());
@@ -26,5 +28,14 @@ public class BookSearchController {
     @PostMapping("/search/multi-match")
     public BookSearchResult searchBooksMultiMatch(@RequestBody MultiMatchSearchRequest request) {
         return bookSearchService.searchByDescriptionMultiMatch(request.query());
+    }
+
+    @PostMapping("/search/bool")
+    public BookSearchResult searchBooksBool(@RequestBody BoolSearchRequest request) {
+        return bookSearchService.sampleBoolQuery(
+                request.description(),
+                request.averageRatingAbove(),
+                request.category(),
+                request.preferYearAfter());
     }
 }
