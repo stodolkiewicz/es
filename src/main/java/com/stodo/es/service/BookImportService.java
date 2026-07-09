@@ -33,6 +33,14 @@ public class BookImportService {
     private Path csvPath;
 
     public long importBooks() {
+        // idempotent: a re-import would overwrite whole documents,
+        // wiping fields added after the initial load (e.g. embeddings)
+        long existing = bookRepository.count();
+        if (existing > 0) {
+            log.info("Index already contains {} books, skipping import", existing);
+            return 0;
+        }
+
         CSVFormat format = CSVFormat.DEFAULT.builder()
                 .setHeader()
                 .setSkipHeaderRecord(true)

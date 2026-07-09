@@ -31,4 +31,6 @@ public class Book {
     private Short publishedYear;
     private Float averageRating;
 
+    @ToString.Exclude
+    private float[] contentVector;
 }

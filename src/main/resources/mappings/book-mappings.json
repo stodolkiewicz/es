@@ -45,6 +45,12 @@
     },
     "averageRating": {
       "type": "float"
+    },
+    "contentVector": {
+      "type": "dense_vector",
+      "dims": 1536,
+      "similarity": "cosine",
+      "index": true
     }
   }
 }

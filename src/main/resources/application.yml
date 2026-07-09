@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: es
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      embedding:
+        model: text-embedding-3-small
