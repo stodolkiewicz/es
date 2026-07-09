@@ -2,6 +2,7 @@ package com.stodo.es.controller;
 
 import com.stodo.es.service.aggregation.BookAggregationService;
 import com.stodo.es.service.aggregation.TopCategories;
+import com.stodo.es.service.aggregation.TopCategoriesWithAvgRating;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,5 +27,10 @@ public class BookAggregationController {
     @GetMapping("/top-categories")
     public TopCategories topCategories() {
         return bookAggregationService.top10CategoriesAggregation();
+    }
+
+    @GetMapping("/top-categories-avg-rating")
+    public TopCategoriesWithAvgRating topCategoriesWithAvgRating() {
+        return bookAggregationService.top10CategoriesWithAvgRatingsAggregation();
     }
 }
