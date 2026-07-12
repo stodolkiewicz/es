@@ -8,3 +8,6 @@ Demo app to learn Elasticsearch:
 # Dataset
 Kaggle dataset (Public Domain):  
 https://www.kaggle.com/datasets/dylanjcastillo/7k-books-with-metadata/data
+
+# Visuals
+![BookFinder.png](docs/BookFinder.png)
