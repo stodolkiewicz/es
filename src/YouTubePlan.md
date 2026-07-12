@@ -15,6 +15,7 @@ starts from the repo (`docker compose up`). Titles target search phrases.
 | 6 | Same in Java: Spring Data Elasticsearch + `NativeQuery` — rewrite queries from ep. 3–5 | "spring data elasticsearch native query" | 15–25 min | not started |
 | 7 | Vector search: `dense_vector` mapping, embeddings (Spring AI), `knn` query, HNSW params | "spring ai elasticsearch vector search" | 15–25 min | Dawid knows Spring AI side; ES syntax to learn |
 | 8 | Hybrid search: BM25 + kNN, score scales problem, RRF; free alternative: `_msearch` + client-side RRF | "hybrid search elasticsearch rrf spring boot" | 15–25 min | theory discussed |
+| 9 | Smart search (multi-query retrieval): LLM expands user query into 3–5 variants → embed batch → N× kNN → single RRF over all lists (semantic + full-text, optional per-list weights) → one ranking. ChatClient + structured output, hand-rolled `RrfRanker` (unit-testable) | "query expansion rag spring ai elasticsearch" | 15–25 min | idea, design agreed |
 
 ## Workflow (learn-by-teaching)
 

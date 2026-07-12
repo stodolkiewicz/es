@@ -49,15 +49,22 @@ public class BookVectorBackfillService {
                                     "book description: " + book.getDescription()
                     )
                     .toList();
+
             EmbeddingResponse embeddings = embeddingService.getEmbeddings(booksToBeEmbedded);
 
             // embeddings come back in input order, so pair them with books by index
             List<UpdateQuery> updates = new ArrayList<>(books.size());
             for (int i = 0; i < books.size(); i++) {
                 float[] vector = embeddings.getResults().get(i).getOutput();
-                updates.add(UpdateQuery.builder(books.get(i).getIsbn13())
-                        .withDocument(Document.create().append("contentVector", vector))
-                        .build());
+                updates.add(
+                    UpdateQuery.builder(books.get(i).getIsbn13())
+                        .withDocument(
+                            Document.create().append(
+                                "contentVector",
+                                vector
+                            )
+                        ).build()
+                );
             }
 
             esOps.bulkUpdate(updates, Book.class);

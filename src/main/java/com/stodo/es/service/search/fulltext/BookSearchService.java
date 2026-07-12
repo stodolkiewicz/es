@@ -1,13 +1,14 @@
-package com.stodo.es.service.search;
+package com.stodo.es.service.search.fulltext;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import com.stodo.es.document.Book;
+import com.stodo.es.service.search.BookSearchResult;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import static com.stodo.es.service.search.BookSearchResultMapper.mapSearchHitsToBookSearchResult;
 
 @Service
 public class BookSearchService {
@@ -59,16 +60,28 @@ public class BookSearchService {
         }
     }
     */
-    public BookSearchResult searchByDescriptionMultiMatch(String description) {
+    public BookSearchResult searchByDescriptionMultiMatch(String description, Double averageRatingAbove) {
 
-        Query query = Query.of(qb -> qb.multiMatch(
+        Query multiMatchQuery = Query.of(qb -> qb.multiMatch(
                         MultiMatchQuery.of(mq -> mq
                                 .query(description)
-                                .fields("title^3", "description")
+                                .fields("title", "subtitle", "description")
                                 .type(TextQueryType.MostFields)
                         )
                 )
         );
+
+        BoolQuery.Builder boolQuery = new BoolQuery.Builder().must(multiMatchQuery);
+
+        if(averageRatingAbove != null) {
+            boolQuery.filter(fq -> fq.range(rq -> rq.number(
+                    nq -> nq
+                            .field("averageRating")
+                            .gte(averageRatingAbove)
+            )));
+        }
+
+        Query query = Query.of(q -> q.bool(boolQuery.build()));
 
         NativeQuery nativeQuery = NativeQuery.builder()
                 .withQuery(query)
@@ -139,18 +152,5 @@ public class BookSearchService {
                 .build();
 
         return mapSearchHitsToBookSearchResult(esOps.search(query, Book.class));
-    }
-
-    private BookSearchResult mapSearchHitsToBookSearchResult(SearchHits<Book> bookSearchHits) {
-        List<BookHit> bookHits = bookSearchHits.stream().map(
-                book -> new BookHit(
-                        book.getContent().getIsbn13(),
-                        book.getContent().getTitle(),
-                        book.getContent().getAuthors(),
-                        book.getContent().getCategories(),
-                        book.getScore())
-        ).toList();
-
-        return new BookSearchResult(bookHits, bookSearchHits.getTotalHits());
     }
 }
