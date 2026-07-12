@@ -19,6 +19,9 @@ import static com.stodo.es.service.search.BookSearchResultMapper.mapSearchHitsTo
 @Service
 public class SemanticSearchService {
 
+    private static final int DEFAULT_NUM_RESULTS = 10;
+    private static final int DEFAULT_NUM_CANDIDATES = 50;
+
     private final EmbeddingService embeddingService;
     private final ElasticsearchOperations esOps;
 
@@ -27,7 +30,7 @@ public class SemanticSearchService {
         this.esOps = esOps;
     }
 
-    public BookSearchResult semanticSearch(String userQuery, Double averageRatingAbove) {
+    public BookSearchResult semanticSearch(String userQuery, Double averageRatingAbove, Integer numResults, Integer numCandidates) {
         EmbeddingResponse embeddingResponse = embeddingService.getEmbeddings(List.of(userQuery));
         float[] vector = embeddingResponse.getResults().getFirst().getOutput();
 
@@ -37,10 +40,13 @@ public class SemanticSearchService {
             queryVector.add(f);
         }
 
+        int effectiveNumResults = numResults != null ? numResults : DEFAULT_NUM_RESULTS;
+        int effectiveNumCandidates = numCandidates != null ? numCandidates : DEFAULT_NUM_CANDIDATES;
+
         KnnSearch.Builder knnSearchBuilder = new KnnSearch.Builder()
                 .field("contentVector")
-                .k(10)
-                .numCandidates(50)
+                .k(effectiveNumResults)
+                .numCandidates(effectiveNumCandidates)
                 .queryVector(queryVector);
 
         if (averageRatingAbove != null) {
@@ -53,6 +59,7 @@ public class SemanticSearchService {
         NativeQuery nativeQuery = NativeQuery.builder()
                 .withKnnSearches(knnSearchBuilder.build())
                 .withSourceFilter(FetchSourceFilter.of(b -> b.withExcludes("contentVector")))
+                .withMaxResults(effectiveNumResults)
                 .build();
 
         SearchHits<Book> bookSearchHits = esOps.search(nativeQuery, Book.class);

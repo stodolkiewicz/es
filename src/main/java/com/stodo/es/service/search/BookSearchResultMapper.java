@@ -14,12 +14,15 @@ public final class BookSearchResultMapper {
                 book -> new BookHit(
                         book.getContent().getIsbn13(),
                         book.getContent().getTitle(),
+                        book.getContent().getSubtitle(),
+                        book.getContent().getDescription(),
                         book.getContent().getAuthors(),
                         book.getContent().getCategories(),
-                        book.getContent().getAverageRating(),
+                        book.getContent().getAverageRating() != null ? book.getContent().getAverageRating() : 0f,
                         book.getScore())
         ).toList();
 
         return new BookSearchResult(bookHits, bookSearchHits.getTotalHits());
     }
+
 }

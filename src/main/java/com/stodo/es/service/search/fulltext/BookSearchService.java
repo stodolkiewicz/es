@@ -13,6 +13,8 @@ import static com.stodo.es.service.search.BookSearchResultMapper.mapSearchHitsTo
 @Service
 public class BookSearchService {
 
+    private static final int DEFAULT_NUM_RESULTS = 10;
+
     private final ElasticsearchOperations esOps;
 
     public BookSearchService(ElasticsearchOperations esOps) {
@@ -60,7 +62,7 @@ public class BookSearchService {
         }
     }
     */
-    public BookSearchResult searchByDescriptionMultiMatch(String description, Double averageRatingAbove) {
+    public BookSearchResult searchByDescriptionMultiMatch(String description, Double averageRatingAbove, Integer numResults) {
 
         Query multiMatchQuery = Query.of(qb -> qb.multiMatch(
                         MultiMatchQuery.of(mq -> mq
@@ -83,8 +85,11 @@ public class BookSearchService {
 
         Query query = Query.of(q -> q.bool(boolQuery.build()));
 
+        int effectiveNumResults = numResults != null ? numResults : DEFAULT_NUM_RESULTS;
+
         NativeQuery nativeQuery = NativeQuery.builder()
                 .withQuery(query)
+                .withMaxResults(effectiveNumResults)
                 .build();
 
         SearchHits<Book> bookSearchHits

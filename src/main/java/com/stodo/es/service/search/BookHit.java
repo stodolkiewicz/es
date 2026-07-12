@@ -2,4 +2,4 @@ package com.stodo.es.service.search;
 
 import java.util.List;
 
-public record BookHit(String isbn13, String title, List<String> authors, List<String> categories, float averageRating, float score) {}
+public record BookHit(String isbn13, String title, String subtitle, String description, List<String> authors, List<String> categories, float averageRating, float score) {}
